@@ -1,0 +1,89 @@
+# indian_locations.txt
+{
+    # ---------- MAJOR CITIES ----------
+    # Northern India
+    "delhi": {"lat": 28.6139, "lon": 77.2090, "name": "Delhi"},
+    "chandigarh": {"lat": 30.7333, "lon": 76.7794, "name": "Chandigarh"},
+    "lucknow": {"lat": 26.8467, "lon": 80.9462, "name": "Lucknow"},
+    "jaipur": {"lat": 26.9124, "lon": 75.7873, "name": "Jaipur"},
+    "kanpur": {"lat": 26.4499, "lon": 80.3319, "name": "Kanpur"},
+    "agra": {"lat": 27.1767, "lon": 78.0081, "name": "Agra"},
+    "varanasi": {"lat": 25.3176, "lon": 82.9739, "name": "Varanasi"},
+    "shimla": {"lat": 31.1048, "lon": 77.1734, "name": "Shimla"},
+    "dehradun": {"lat": 30.3165, "lon": 78.0322, "name": "Dehradun"},
+    "amritsar": {"lat": 31.6340, "lon": 74.8723, "name": "Amritsar"},
+    
+    # Western India
+    "mumbai": {"lat": 19.0760, "lon": 72.8777, "name": "Mumbai"},
+    "pune": {"lat": 18.5204, "lon": 73.8567, "name": "Pune"},
+    "ahmedabad": {"lat": 23.0225, "lon": 72.5714, "name": "Ahmedabad"},
+    "surat": {"lat": 21.1702, "lon": 72.8311, "name": "Surat"},
+    "vadodara": {"lat": 22.3072, "lon": 73.1812, "name": "Vadodara"},
+    "nagpur": {"lat": 21.1458, "lon": 79.0882, "name": "Nagpur"},
+    "panaji": {"lat": 15.4909, "lon": 73.8278, "name": "Panaji"},
+    
+    # Eastern India
+    "kolkata": {"lat": 22.5726, "lon": 88.3639, "name": "Kolkata"},
+    "patna": {"lat": 25.5941, "lon": 85.1376, "name": "Patna"},
+    "ranchi": {"lat": 23.3441, "lon": 85.3096, "name": "Ranchi"},
+    "bhubaneswar": {"lat": 20.2961, "lon": 85.8245, "name": "Bhubaneswar"},
+    "guwahati": {"lat": 26.1445, "lon": 91.7362, "name": "Guwahati"},
+    "imphal": {"lat": 24.8170, "lon": 93.9368, "name": "Imphal"},
+    "gangtok": {"lat": 27.3389, "lon": 88.6065, "name": "Gangtok"},
+    
+    # Southern India
+    "bangalore": {"lat": 12.9716, "lon": 77.5946, "name": "Bangalore"},
+    "hyderabad": {"lat": 17.3850, "lon": 78.4867, "name": "Hyderabad"},
+    "chennai": {"lat": 13.0827, "lon": 80.2707, "name": "Chennai"},
+    "kochi": {"lat": 9.9312, "lon": 76.2673, "name": "Kochi"},
+    "thiruvananthapuram": {"lat": 8.5241, "lon": 76.9366, "name": "Thiruvananthapuram"},
+    "coimbatore": {"lat": 11.0168, "lon": 76.9558, "name": "Coimbatore"},
+    "mysuru": {"lat": 12.2958, "lon": 76.6394, "name": "Mysuru"},
+    "visakhapatnam": {"lat": 17.6868, "lon": 83.2185, "name": "Visakhapatnam"},
+    
+    # Central India
+    "bhopal": {"lat": 23.2599, "lon": 77.4126, "name": "Bhopal"},
+    "indore": {"lat": 22.7196, "lon": 75.8577, "name": "Indore"},
+    "raipur": {"lat": 21.2514, "lon": 81.6296, "name": "Raipur"},
+
+    # ---------- STATES ----------
+    "andhra_pradesh": {"lat": 15.9129, "lon": 79.7400, "name": "Andhra Pradesh"},
+    "arunachal_pradesh": {"lat": 28.2180, "lon": 94.7278, "name": "Arunachal Pradesh"},
+    "assam": {"lat": 26.2006, "lon": 92.9376, "name": "Assam"},
+    "bihar": {"lat": 25.0961, "lon": 85.3131, "name": "Bihar"},
+    "chhattisgarh": {"lat": 21.2787, "lon": 81.8661, "name": "Chhattisgarh"},
+    "goa": {"lat": 15.2993, "lon": 74.1240, "name": "Goa"},
+    "gujarat": {"lat": 22.2587, "lon": 71.1924, "name": "Gujarat"},
+    "haryana": {"lat": 29.0588, "lon": 76.0856, "name": "Haryana"},
+    "himachal_pradesh": {"lat": 31.1048, "lon": 77.1734, "name": "Himachal Pradesh"},
+    "jharkhand": {"lat": 23.6102, "lon": 85.2799, "name": "Jharkhand"},
+    "karnataka": {"lat": 15.3173, "lon": 75.7139, "name": "Karnataka"},
+    "kerala": {"lat": 10.8505, "lon": 76.2711, "name": "Kerala"},
+    "madhya_pradesh": {"lat": 22.9734, "lon": 78.6569, "name": "Madhya Pradesh"},
+    "maharashtra": {"lat": 19.7515, "lon": 75.7139, "name": "Maharashtra"},
+    "manipur": {"lat": 24.6637, "lon": 93.9063, "name": "Manipur"},
+    "meghalaya": {"lat": 25.4670, "lon": 91.3662, "name": "Meghalaya"},
+    "mizoram": {"lat": 23.1645, "lon": 92.9376, "name": "Mizoram"},
+    "nagaland": {"lat": 26.1584, "lon": 94.5624, "name": "Nagaland"},
+    "odisha": {"lat": 20.9517, "lon": 85.0985, "name": "Odisha"},
+    "punjab": {"lat": 31.1471, "lon": 75.3412, "name": "Punjab"},
+    "rajasthan": {"lat": 27.0238, "lon": 74.2179, "name": "Rajasthan"},
+    "sikkim": {"lat": 27.5330, "lon": 88.5122, "name": "Sikkim"},
+    "tamil_nadu": {"lat": 11.1271, "lon": 78.6569, "name": "Tamil Nadu"},
+    "telangana": {"lat": 18.1124, "lon": 79.0193, "name": "Telangana"},
+    "tripura": {"lat": 23.9408, "lon": 91.9882, "name": "Tripura"},
+    "uttar_pradesh": {"lat": 26.8467, "lon": 80.9462, "name": "Uttar Pradesh"},
+    "uttarakhand": {"lat": 30.0668, "lon": 79.0193, "name": "Uttarakhand"},
+    "west_bengal": {"lat": 22.9868, "lon": 87.8550, "name": "West Bengal"},
+
+    # ---------- UNION TERRITORIES ----------
+    "andaman_and_nicobar": {"lat": 11.7401, "lon": 92.6586, "name": "Andaman and Nicobar Islands"},
+    "chandigarh_ut": {"lat": 30.7333, "lon": 76.7794, "name": "Chandigarh"},
+    "dadra_nagar_haveli": {"lat": 20.1809, "lon": 73.0169, "name": "Dadra and Nagar Haveli"},
+    "daman_and_diu": {"lat": 20.4283, "lon": 72.8397, "name": "Daman and Diu"},
+    "delhi_ut": {"lat": 28.6139, "lon": 77.2090, "name": "Delhi"},
+    "jammu_and_kashmir": {"lat": 33.7782, "lon": 76.5762, "name": "Jammu and Kashmir"},
+    "ladakh": {"lat": 34.2268, "lon": 77.5619, "name": "Ladakh"},
+    "lakshadweep": {"lat": 10.5667, "lon": 72.6417, "name": "Lakshadweep"},
+    "puducherry": {"lat": 11.9416, "lon": 79.8083, "name": "Puducherry"}
+}
