@@ -2,101 +2,215 @@ import os
 import telebot
 import requests
 import json
-import ast
+import re
 from dotenv import load_dotenv
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 load_dotenv()
 BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
-try:
-    with open('locations.txt', 'r') as file:
-        LOCATIONS = ast.literal_eval(file.read())
-except Exception as e:
-    print(f"❌ Error loading location data: {e}")
-    LOCATIONS = {}
+def load_locations_file():
+    try:
+        with open('locations.txt', 'r') as file:
+            content = file.read()
+            # Remove comments (lines starting with # and inline comments)
+            content = re.sub(r'#.*$', '', content, flags=re.MULTILINE)
+            # Parse the cleaned content
+            return eval(content)
+    except Exception as e:
+        print(f"❌ Error loading location data: {e}")
+        # Return empty dict if file can't be loaded
+        return {}
 
+# Load locations
+LOCATIONS = load_locations_file()
+if not LOCATIONS:
+    print("⚠️ Warning: No locations loaded. Check your locations.txt file.")
 
-"""
-locations_list = ""
-
-# For location List
-for location_info in LOCATIONS.values():
-    location_name = location_info['name']
-    locations_list += f"• {location_name}\n"
-    
-"""
 
 class WeatherBot:
     def __init__(self, token):
         self.bot = telebot.TeleBot(token)
-        self.setup_commands()
+        self.setup_handlers()
 
-    def setup_commands(self):
-
-        @self.bot.message_handler(content_types=['new_chat_members'])
-        def welcomenew_member(message):
-            for new_member in message.new_chat_members:
-                welcome_text = f"""🎉 User {new_member.first_name}, Welcome to Weather Group. ☁️\n
-                Type /start to get started"""
-                self.bot.send_message(message.chat.id, welcome_text)
-
-        @self.bot.message_handler(content_types=['left_chat_member'])
-        def goodbyemember(message):
-            left_member = message.left_chat_member
-            goodbye_text = f"""👋 User {left_member.first_name}, we're sorry to see you go. 🌧️\n
-            We hope you visit again soon!"""
-            self.bot.send_message(message.chat.id, goodbye_text)
-
-
+    def setup_handlers(self):
         @self.bot.message_handler(commands=['start'])
         def send_welcome(message):
-            welcome_text = {
-            "👋Hello! I'm your Weather Bot!\n\n"
-            "🌤️ I can provide you with the current weather of INDIAN Cities/States\n\n"
-            "\t/help - Get help on how to use me"
-            }
+            markup = InlineKeyboardMarkup(row_width=2)
+            markup.add(
+                InlineKeyboardButton("🌤️ Get Weather", callback_data="get_weather"),
+                InlineKeyboardButton("❓ Help", callback_data="help")
+            )
+            
+            welcome_text = (
+                "👋 Hello! I'm your Weather Bot!\n\n"
+                "🌤️ I can provide you with the current weather of INDIAN Cities/States\n\n"
+                "Please select an option from the menu below:"
+            )
+            self.bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
-            self.bot.send_message(message.chat.id, welcome_text)
         @self.bot.message_handler(commands=['help'])
-        def send_welcome(message):
-            welcome_text = {
-            "Here's how to use me:\n\n"
-            "📍 Just send me a city or state name like this:\n"
-            "\t\t/weather delhi\n"
-            "\t\t/weather mumbai\n\n"
+        def help_command(message):
+            help_text = (
+                "📖 How to use this bot:\n\n"
+                "1. Click on '🌤️ Get Weather' to see the list of available cities\n"
+                "2. Select a city from the list\n"
+                "3. The bot will show you the current weather for that city\n\n"
+                "You can also use these commands:\n"
+                "/start - Show the main menu\n"
+                "/help - Show this help message"
+            )
+            self.bot.send_message(message.chat.id, help_text)
 
-            "Try it now! 🌤️"
-            }
+        @self.bot.callback_query_handler(func=lambda call: True)
+        def callback_query(call):
+            if call.data == "get_weather":
+                self.show_categories(call.message)
+            elif call.data == "help":
+                help_text = (
+                    "📖 How to use this bot:\n\n"
+                    "1. Click on '🌤️ Get Weather' to see the list of available cities\n"
+                    "2. Select a city from the list\n"
+                    "3. The bot will show you the current weather for that city\n\n"
+                    "You can also use these commands:\n"
+                    "/start - Show the main menu\n"
+                    "/help - Show this help message"
+                )
+                self.bot.send_message(call.message.chat.id, help_text)
+            elif call.data == "cities_north":
+                self.show_region_cities(call.message, "North", 
+                    ["delhi", "chandigarh", "lucknow", "jaipur", "kanpur", 
+                    "agra", "varanasi", "shimla", "dehradun", "amritsar"])
+            elif call.data == "cities_south":
+                self.show_region_cities(call.message, "South", 
+                    ["bangalore", "hyderabad", "chennai", "kochi", 
+                    "thiruvananthapuram", "coimbatore", "mysuru", "visakhapatnam"])
+            elif call.data == "cities_east":
+                self.show_region_cities(call.message, "East", 
+                    ["kolkata", "patna", "ranchi", "bhubaneswar", 
+                    "guwahati", "imphal", "gangtok"])
+            elif call.data == "cities_west":
+                self.show_region_cities(call.message, "West", 
+                    ["mumbai", "pune", "ahmedabad", "surat", 
+                    "vadodara", "nagpur", "panaji"])
+            elif call.data == "cities_central":
+                self.show_region_cities(call.message, "Central", 
+                    ["bhopal", "indore", "raipur"])
+            elif call.data == "states":
+                self.show_states(call.message)
+            elif call.data == "uts":
+                self.show_union_territories(call.message)
+            elif call.data.startswith("city_"):
+                city_key = call.data[5:]  # Remove "city_" prefix
+                if city_key in LOCATIONS:
+                    location_data = LOCATIONS[city_key]
+                    weather_report = self.get_weather(
+                        location_data["lat"],
+                        location_data["lon"],
+                        location_data["name"]
+                    )
+                    self.bot.send_message(call.message.chat.id, weather_report)
+                    
+                    # Add prompt to check another location
+                    self.ask_for_another_check(call.message.chat.id)
+                else:
+                    self.bot.send_message(call.message.chat.id, "❌ Invalid city selection!")
+            
+            # Answer callback query to remove the loading state
+            self.bot.answer_callback_query(call.id)
 
-            self.bot.send_message(message.chat.id, welcome_text)
+    def ask_for_another_check(self, chat_id):
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton("✅ Check another location", callback_data="get_weather"),
+            InlineKeyboardButton("🏠 Back to main menu", callback_data="back_to_main")
+        )
+        
+        self.bot.send_message(
+            chat_id,
+            "Would you like to check weather for another location?",
+            reply_markup=markup
+        )
 
-        @self.bot.message_handler(commands=['weather'])
-        def handle_weather(message):
-            try:
-                parts = message.text.split()
-                
-                # Check if the user provided a location
-                if len(parts) < 2:
-                    self.bot.send_message(message.chat.id, "❌ Please provide a location after the /weather command.")
-                    return
-                
-                location = parts[1].lower()
+    def show_categories(self, message):
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton("🏙️ North India", callback_data="cities_north"),
+            InlineKeyboardButton("🏙️ South India", callback_data="cities_south"),
+            InlineKeyboardButton("🏙️ East India", callback_data="cities_east"),
+            InlineKeyboardButton("🏙️ West India", callback_data="cities_west"),
+            InlineKeyboardButton("🏙️ Central India", callback_data="cities_central"),
+            InlineKeyboardButton("🗺️ States", callback_data="states"),
+            InlineKeyboardButton("🏛️ Union Territories", callback_data="uts"),
+            InlineKeyboardButton("🏠 Back to main menu", callback_data="back_to_main")
+        )
+        
+        self.bot.send_message(
+            message.chat.id,
+            "📍 Please select a region:",
+            reply_markup=markup
+        )
 
-                # Check if the location exists in the locations dictionary
-                if location not in LOCATIONS:
-                    self.bot.send_message(message.chat.id, "❌ Unknown location! Please choose from the available locations.")
-                    return
+    def show_region_cities(self, message, region_name, city_keys):
+        markup = InlineKeyboardMarkup(row_width=2)
+        
+        for city_key in city_keys:
+            if city_key in LOCATIONS:
+                markup.add(InlineKeyboardButton(LOCATIONS[city_key]["name"], callback_data=f"city_{city_key}"))
+        
+        # Add back button
+        markup.add(InlineKeyboardButton("◀️ Back", callback_data="get_weather"))
+        
+        self.bot.send_message(
+            message.chat.id,
+            f"📍 Cities in {region_name} India:",
+            reply_markup=markup
+        )
 
-                location_data = LOCATIONS[location]
-                latitude = location_data["lat"]
-                longitude = location_data["lon"]
+    def show_states(self, message):
+        markup = InlineKeyboardMarkup(row_width=2)
+        state_keys = [
+            "andhra_pradesh", "arunachal_pradesh", "assam", "bihar", 
+            "chhattisgarh", "goa", "gujarat", "haryana", "himachal_pradesh", 
+            "jharkhand", "karnataka", "kerala", "madhya_pradesh", "maharashtra", 
+            "manipur", "meghalaya", "mizoram", "nagaland", "odisha", "punjab", 
+            "rajasthan", "sikkim", "tamil_nadu", "telangana", "tripura", 
+            "uttar_pradesh", "uttarakhand", "west_bengal"
+        ]
+        
+        for state_key in state_keys:
+            if state_key in LOCATIONS:
+                markup.add(InlineKeyboardButton(LOCATIONS[state_key]["name"], callback_data=f"city_{state_key}"))
+        
+        # Add back button
+        markup.add(InlineKeyboardButton("◀️ Back", callback_data="get_weather"))
+        
+        self.bot.send_message(
+            message.chat.id,
+            "📍 Select a state:",
+            reply_markup=markup
+        )
 
-                # Get and send the weather report
-                weather_report = self.get_weather(latitude, longitude, location_data["name"])
-                self.bot.send_message(message.chat.id, weather_report)
-
-            except Exception as e:
-                self.bot.send_message(message.chat.id, f"❌ Oops! Something went wrong: {e}")
+    def show_union_territories(self, message):
+        markup = InlineKeyboardMarkup(row_width=2)
+        ut_keys = [
+            "andaman_and_nicobar", "chandigarh_ut", "dadra_nagar_haveli", 
+            "daman_and_diu", "delhi_ut", "jammu_and_kashmir", "ladakh", 
+            "lakshadweep", "puducherry"
+        ]
+        
+        for ut_key in ut_keys:
+            if ut_key in LOCATIONS:
+                markup.add(InlineKeyboardButton(LOCATIONS[ut_key]["name"], callback_data=f"city_{ut_key}"))
+        
+        # Add back button
+        markup.add(InlineKeyboardButton("◀️ Back", callback_data="get_weather"))
+        
+        self.bot.send_message(
+            message.chat.id,
+            "📍 Select a Union Territory:",
+            reply_markup=markup
+        )
 
     def get_weather(self, latitude, longitude, location_name):
         url = "https://api.open-meteo.com/v1/forecast"
@@ -152,15 +266,13 @@ class WeatherBot:
 
             weather_condition = weather_conditions.get(weather_code, "Unknown weather condition")
 
-            # Initialize weather_report before appending data
             weather_report = f"🌍 Current Weather for {location_name}\n"
             weather_report += f"""
-            🌡️ Temperature: {temperature}°C
-            💨 Wind Speed: {wind_speed} m/s
-            🌬️ Wind Direction: {wind_direction}°
-            🌤️ Condition: {weather_condition}
-
-            """
+🌡️ Temperature: {temperature}°C
+💨 Wind Speed: {wind_speed} m/s
+🌬️ Wind Direction: {wind_direction}°
+🌤️ Condition: {weather_condition}
+"""
             
             return weather_report
 
